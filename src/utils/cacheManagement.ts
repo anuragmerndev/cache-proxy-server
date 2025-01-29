@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AllUrlResponseFormat, CacheType, SingleResponseFormat } from "./type";
+import { AllUrlResponseFormat, CacheType, SingleResponseFormat } from "../type";
 
 class UrlCacheManagement {
     baseUrl: string;

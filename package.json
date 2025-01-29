@@ -1,9 +1,9 @@
 {
-  "name": "cache-proxy-server",
+  "name": "caching-proxy",
   "version": "1.0.0",
   "main": "index.js",
   "bin": {
-    "cache-proxy": "./bin/cache-proxy"
+    "caching-proxy": "./bin/caching-proxy"
   },
   "scripts": {
     "start:dev": "tsx --watch src/server.ts",

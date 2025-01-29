@@ -1,4 +1,4 @@
-import { CacheType } from "./type";
+import { CacheType } from "../type";
 
 // check the type of object
 
