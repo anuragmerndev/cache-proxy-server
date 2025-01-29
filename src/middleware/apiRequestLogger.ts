@@ -8,7 +8,7 @@ const apiRequestLogger = async (req: Request, res: Response, next: NextFunction)
 
     res.on("finish", () => {
         const duration = Date.now() - start;
-        logger.info(`Response Sent - Cache-Status: ${res.getHeader('X-Cache')} Status: ${res.statusCode}, Duration: ${duration}ms`)
+        logger.info(`Response Sent - Cache-Status: ${res.getHeader('X-Cache')}, Api-Status: ${res.statusCode}, Duration: ${duration}ms`)
     })
 
     next();

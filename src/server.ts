@@ -1,6 +1,6 @@
 import express from "express";
 import { AppArguments } from "./utils/AppArgManagement";
-import { UrlCacheManagement } from "./utils/cacheManagement";
+import { CentralCacheManagement } from "./utils/cacheManagement";
 import { getCacheHeader } from "./utils/helper";
 import { apiRequestLogger } from "./middleware/apiRequestLogger";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
@@ -13,14 +13,26 @@ if (!appArgs.getArgValue('port') && !appArgs.getArgValue('origin')) {
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(apiRequestLogger);
 
-const PORT = Number(appArgs.getArgValue('port'))  || 3000;
-const urlCache = new UrlCacheManagement(appArgs.getArgValue('origin')!)
+const PORT = Number(appArgs.getArgValue('port')) || 3000;
+const urlCache = new CentralCacheManagement(appArgs.getArgValue('origin')!)
 
 app.get("/healthy", (_req, res) => {
     res.send("working");
+})
+
+app.get("/cache", async (req, res) => {
+    const data = await urlCache.getAllCachedUrl();
+    res.send(data);
+})
+
+app.get("/cacheCount", async (req, res) => {
+    const cacheCount = await urlCache.totalUrlCached();
+    res.send({
+        cachedUrls: cacheCount
+    })
 })
 
 app.get("*", async (req, res) => {
