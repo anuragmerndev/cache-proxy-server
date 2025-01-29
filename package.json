@@ -1,0 +1,27 @@
+{
+  "name": "cache-proxy-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "bin": {
+    "cache-proxy": "./bin/cache-proxy"
+  },
+  "scripts": {
+    "start:dev": "tsx --watch src/server.ts",
+    "build": "tsc -b",
+    "start:prod": "node dist/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "express": "^4.21.2",
+    "winston": "^3.17.0"
+  }
+}
