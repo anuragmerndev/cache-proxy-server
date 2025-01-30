@@ -3,6 +3,7 @@ import { AllUrlResponseFormat, CacheType, SingleResponseFormat } from "../type";
 import Redis from "ioredis";
 import { logger } from "../logger";
 import RedisClient from "../config/redis";
+import { deleteExpiredKey } from "./helper";
 
 // cache management abstract
 abstract class CacheManagement {
@@ -37,12 +38,15 @@ class LocalCacheManagement extends CacheManagement {
 
             const apiData = await axios.get(url);
             this.cachedUrls.set(url, apiData.data);
+            deleteExpiredKey(async () => {
+                this.cachedUrls.delete(url)
+            }, 10 * 1000)
             return {
                 data: apiData.data,
                 type: CacheType.MISS
             };
         } catch (err: Error | any) {
-            console.log(`Error: calling api ==>`, err);
+            logger.error(`Error: calling api ==>`, err);
             return {
                 data: {},
                 type: CacheType.FAILED
@@ -80,7 +84,12 @@ class RedisCacheManagemt extends CacheManagement {
                 }
             }
             const apiData = await axios.get(url);
-            await this.redisClient.hset(this.baseUrl, { [url]: JSON.stringify(apiData.data) });
+            const hey = await this.redisClient.hset(this.baseUrl, { [url]: JSON.stringify(apiData.data) });
+            console.log({hey});
+            
+            await deleteExpiredKey(async () => {
+                    await this.redisClient.hdel(this.baseUrl, url);
+            }, 20 * 1000);
             return {
                 data: apiData.data,
                 type: CacheType.MISS

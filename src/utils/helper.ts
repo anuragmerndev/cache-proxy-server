@@ -1,3 +1,4 @@
+import { logger } from "../logger";
 import { CacheType } from "../type";
 
 // check the type of object
@@ -18,4 +19,16 @@ const getCacheHeader = (cacheStatus: number): string => {
     }
 }
 
-export { getCacheHeader }
+const deleteExpiredKey = (cb: () => Promise<void>, expiry = 60 * 60 * 1000) => {
+    setTimeout(async () => {
+        try {
+            logger.info('🔁 Deleting the key')
+            await cb()    
+            logger.info('✅ Key deleted successfully')
+        } catch (err) {
+            logger.error('❌ Error deleting the key ==> ', err);
+        }
+        }, expiry);
+}
+
+export { getCacheHeader, deleteExpiredKey }
