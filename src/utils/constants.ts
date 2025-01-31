@@ -1,0 +1,3 @@
+const KEY_EXPIRY_TIME = 10;
+
+export { KEY_EXPIRY_TIME }

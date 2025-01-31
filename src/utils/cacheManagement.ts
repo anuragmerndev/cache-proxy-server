@@ -4,6 +4,7 @@ import Redis from "ioredis";
 import { logger } from "../logger";
 import RedisClient from "../config/redis";
 import { deleteExpiredKey } from "./helper";
+import { KEY_EXPIRY_TIME } from "./constants";
 
 // cache management abstract
 abstract class CacheManagement {
@@ -38,15 +39,15 @@ class LocalCacheManagement extends CacheManagement {
 
             const apiData = await axios.get(url);
             this.cachedUrls.set(url, apiData.data);
-            deleteExpiredKey(async () => {
+            await deleteExpiredKey(async () => {
                 this.cachedUrls.delete(url)
-            }, 10 * 1000)
+            }, KEY_EXPIRY_TIME * 1000)
             return {
                 data: apiData.data,
                 type: CacheType.MISS
             };
         } catch (err: Error | any) {
-            logger.error(`Error: calling api ==>`, err);
+            logger.error(`Error: calling api ==> API: ${url}`, err);
             return {
                 data: {},
                 type: CacheType.FAILED
@@ -89,7 +90,8 @@ class RedisCacheManagemt extends CacheManagement {
             
             await deleteExpiredKey(async () => {
                     await this.redisClient.hdel(this.baseUrl, url);
-            }, 20 * 1000);
+            }, KEY_EXPIRY_TIME * 1000);
+
             return {
                 data: apiData.data,
                 type: CacheType.MISS
@@ -172,4 +174,4 @@ class CentralCacheManagement extends CacheManagement {
 }
 
 
-export { CentralCacheManagement }
+export { CentralCacheManagement, LocalCacheManagement, RedisCacheManagemt }

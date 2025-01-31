@@ -19,7 +19,7 @@ const getCacheHeader = (cacheStatus: number): string => {
     }
 }
 
-const deleteExpiredKey = (cb: () => Promise<void>, expiry = 60 * 60 * 1000) => {
+const deleteExpiredKey = async (cb: () => Promise<void>, expiry = 60 * 60 * 1000) => {
     setTimeout(async () => {
         try {
             logger.info('🔁 Deleting the key')
