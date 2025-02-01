@@ -1,5 +1,5 @@
 import { CacheType } from "../type";
-import { LocalCacheManagement } from "../utils/cacheManagement";
+import { RedisCacheManagemt } from "../utils/cacheManagement";
 import { KEY_EXPIRY_TIME } from "../utils/constants";
 
 /**
@@ -11,18 +11,41 @@ import { KEY_EXPIRY_TIME } from "../utils/constants";
  */
 
 jest.mock('ioredis', () => {
+    const cacheStore: Record<string, any> = {};
+
     return jest.fn().mockImplementation(() => ({
         on: jest.fn(),
-        set: jest.fn(),
-        get: jest.fn().mockResolvedValue(null),
-        del: jest.fn(),
+        hget: jest.fn().mockImplementation((baseUrl, url) => {
+            return Promise.resolve(cacheStore[`${baseUrl}:${url}`] || null);
+        }),
+        hset: jest.fn().mockImplementation((baseUrl, obj) => {
+            Object.entries(obj).forEach(([key, value]) => {
+                cacheStore[`${baseUrl}:${key}`] = value;
+            });
+            return Promise.resolve(1);
+        }),
+        hdel: jest.fn().mockImplementation((baseUrl, url) => {
+            delete cacheStore[`${baseUrl}:${url}`];
+            return Promise.resolve(1);
+        }),
+        hgetall: jest.fn().mockImplementation((baseUrl) => {
+            return Promise.resolve(
+                Object.keys(cacheStore)
+                    .filter((key) => key.startsWith(`${baseUrl}:`))
+                    .reduce((acc: any, key) => {
+                        const newKey = key.replace(`${baseUrl}:`, '');
+                        acc[newKey] = cacheStore[key];
+                        return acc;
+                    }, {})
+            );
+        }),
         quit: jest.fn(),
     }));
 });
 
 
-describe('Testing Local CacheManagement', () => {
-    let cache: LocalCacheManagement;
+describe('Testing Redis CacheManagement', () => {
+    let cache: RedisCacheManagemt;
     const hostUrl = 'http://dummyjson.com';
     const endUrl = hostUrl + '/todos/1';
 
@@ -34,7 +57,7 @@ describe('Testing Local CacheManagement', () => {
     }
 
     beforeAll(() => {
-        cache = new LocalCacheManagement(hostUrl);
+        cache = new RedisCacheManagemt(hostUrl);
     })
 
     test('check if the data is not cached', async () => {
@@ -52,15 +75,15 @@ describe('Testing Local CacheManagement', () => {
         expect(duration).toBeLessThan(5);
     });
 
-    test('check if the get All Cached Url retrieves all URL', () => {
-        const data = cache.getAllCachedUrl();
+    test('check if the get All Cached Url retrieves all URL', async () => {
+        const data = await cache.getAllCachedUrl();
         expect(data).toMatchObject({
             [endUrl]: response
         })
     });
 
-    test('check if the total Url Cached returns the correct size of the urls', () => {
-        const data = cache.totalUrlCached();
+    test('check if the total Url Cached returns the correct size of the urls', async () => {
+        const data = await cache.totalUrlCached();
         expect(data).toBe(1);
     });
 
@@ -72,11 +95,11 @@ describe('Testing Local CacheManagement', () => {
 
         await cache.getData(expiryTestUrl);
 
-        expect(Object.keys(cache.getAllCachedUrl())).toContain(expiryTestUrl);
+        expect(Object.keys(await cache.getAllCachedUrl())).toContain(expiryTestUrl);
 
         await new Promise((resolve) => setTimeout(resolve, expiryTime + 100));
 
-        expect(cache.getAllCachedUrl()).not.toHaveProperty(expiryTestUrl);
+        expect(await cache.getAllCachedUrl()).not.toHaveProperty(expiryTestUrl);
     }, KEY_EXPIRY_TIME * 3000);
 
 })

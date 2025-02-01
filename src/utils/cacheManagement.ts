@@ -86,7 +86,6 @@ class RedisCacheManagemt extends CacheManagement {
             }
             const apiData = await axios.get(url);
             const hey = await this.redisClient.hset(this.baseUrl, { [url]: JSON.stringify(apiData.data) });
-            console.log({hey});
             
             await deleteExpiredKey(async () => {
                     await this.redisClient.hdel(this.baseUrl, url);
