@@ -1,9 +1,13 @@
 import express from "express";
+import { config } from 'dotenv';
+
 import { AppArguments } from "./utils/AppArgManagement";
 import { CentralCacheManagement } from "./utils/cacheManagement";
 import { getCacheHeader } from "./utils/helper";
 import { apiRequestLogger } from "./middleware/apiRequestLogger";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
+
+config();
 
 const appArgs = new AppArguments(process.argv);
 

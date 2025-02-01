@@ -13,9 +13,9 @@ abstract class CacheManagement {
         this.baseUrl = baseUrl;
     }
 
-    public getData(url: string) {}
-    public getAllCachedUrl() {}
-    public totalUrlCached() {}
+    public getData(url: string) { }
+    public getAllCachedUrl() { }
+    public totalUrlCached() { }
 }
 
 class LocalCacheManagement extends CacheManagement {
@@ -38,15 +38,15 @@ class LocalCacheManagement extends CacheManagement {
 
             const apiData = await axios.get(url);
             this.cachedUrls.set(url, apiData.data);
-            deleteExpiredKey(async () => {
+            await deleteExpiredKey(async () => {
                 this.cachedUrls.delete(url)
-            }, 10 * 1000)
+            })
             return {
                 data: apiData.data,
                 type: CacheType.MISS
             };
         } catch (err: Error | any) {
-            logger.error(`Error: calling api ==>`, err);
+            logger.error(`Error: calling api ==> API: ${url}`, err);
             return {
                 data: {},
                 type: CacheType.FAILED
@@ -84,12 +84,12 @@ class RedisCacheManagemt extends CacheManagement {
                 }
             }
             const apiData = await axios.get(url);
-            const hey = await this.redisClient.hset(this.baseUrl, { [url]: JSON.stringify(apiData.data) });
-            console.log({hey});
-            
+            await this.redisClient.hset(this.baseUrl, { [url]: JSON.stringify(apiData.data) });
+
             await deleteExpiredKey(async () => {
-                    await this.redisClient.hdel(this.baseUrl, url);
-            }, 20 * 1000);
+                await this.redisClient.hdel(this.baseUrl, url);
+            });
+
             return {
                 data: apiData.data,
                 type: CacheType.MISS
@@ -124,10 +124,11 @@ class CentralCacheManagement extends CacheManagement {
     redisClient: Redis;
     private isRedisConnected: boolean = false;
     constructor(baseUrl: string) {
-        super(baseUrl)
-        this.localCache = new LocalCacheManagement(baseUrl);
-        this.redisCache = new RedisCacheManagemt(baseUrl);
+        const base = baseUrl || 'default';
+        super(base);
         this.redisClient = RedisClient.getInstance();
+        this.localCache = new LocalCacheManagement(base);
+        this.redisCache = new RedisCacheManagemt(base);
 
         this.redisClient.on("connect", () => {
             logger.info('Redis server is up |🔀 Switching to redis cache mode');
@@ -172,4 +173,4 @@ class CentralCacheManagement extends CacheManagement {
 }
 
 
-export { CentralCacheManagement }
+export { CentralCacheManagement, LocalCacheManagement, RedisCacheManagemt }
