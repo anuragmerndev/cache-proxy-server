@@ -4,7 +4,6 @@ import Redis from "ioredis";
 import { logger } from "../logger";
 import RedisClient from "../config/redis";
 import { deleteExpiredKey } from "./helper";
-import { KEY_EXPIRY_TIME } from "./constants";
 
 // cache management abstract
 abstract class CacheManagement {
@@ -14,9 +13,9 @@ abstract class CacheManagement {
         this.baseUrl = baseUrl;
     }
 
-    public getData(url: string) {}
-    public getAllCachedUrl() {}
-    public totalUrlCached() {}
+    public getData(url: string) { }
+    public getAllCachedUrl() { }
+    public totalUrlCached() { }
 }
 
 class LocalCacheManagement extends CacheManagement {
@@ -41,7 +40,7 @@ class LocalCacheManagement extends CacheManagement {
             this.cachedUrls.set(url, apiData.data);
             await deleteExpiredKey(async () => {
                 this.cachedUrls.delete(url)
-            }, KEY_EXPIRY_TIME * 1000)
+            })
             return {
                 data: apiData.data,
                 type: CacheType.MISS
@@ -85,11 +84,11 @@ class RedisCacheManagemt extends CacheManagement {
                 }
             }
             const apiData = await axios.get(url);
-            const hey = await this.redisClient.hset(this.baseUrl, { [url]: JSON.stringify(apiData.data) });
-            
+            await this.redisClient.hset(this.baseUrl, { [url]: JSON.stringify(apiData.data) });
+
             await deleteExpiredKey(async () => {
-                    await this.redisClient.hdel(this.baseUrl, url);
-            }, KEY_EXPIRY_TIME * 1000);
+                await this.redisClient.hdel(this.baseUrl, url);
+            });
 
             return {
                 data: apiData.data,
@@ -125,10 +124,11 @@ class CentralCacheManagement extends CacheManagement {
     redisClient: Redis;
     private isRedisConnected: boolean = false;
     constructor(baseUrl: string) {
-        super(baseUrl)
-        this.localCache = new LocalCacheManagement(baseUrl);
-        this.redisCache = new RedisCacheManagemt(baseUrl);
+        const base = baseUrl || 'default';
+        super(base);
         this.redisClient = RedisClient.getInstance();
+        this.localCache = new LocalCacheManagement(base);
+        this.redisCache = new RedisCacheManagemt(base);
 
         this.redisClient.on("connect", () => {
             logger.info('Redis server is up |🔀 Switching to redis cache mode');

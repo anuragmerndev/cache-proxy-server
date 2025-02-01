@@ -37,13 +37,13 @@ describe('Testing Local CacheManagement', () => {
         cache = new LocalCacheManagement(hostUrl);
     })
 
-    test('check if the data is not cached', async () => {
+    test('Should not have data cached on first hit', async () => {
         const data = await cache.getData(endUrl);
         expect(data.data).toMatchObject(response);
         expect(data.type).toBe(CacheType.MISS);
     });
 
-    test('check if the data is cached', async () => {
+    test('Should cache data on second hit and response time should be less that 5ms', async () => {
         const start = Date.now();
         const data = await cache.getData(endUrl);
         const duration = Date.now() - start;
@@ -52,19 +52,19 @@ describe('Testing Local CacheManagement', () => {
         expect(duration).toBeLessThan(5);
     });
 
-    test('check if the get All Cached Url retrieves all URL', () => {
+    test('Should retrieves all URLs on get All Cached Url ', () => {
         const data = cache.getAllCachedUrl();
         expect(data).toMatchObject({
             [endUrl]: response
         })
     });
 
-    test('check if the total Url Cached returns the correct size of the urls', () => {
+    test('Should returns the correct size of the cached urls', () => {
         const data = cache.totalUrlCached();
         expect(data).toBe(1);
     });
 
-    test('check if the data is being cleared after {defined} time or not', async () => {
+    test('Should cleare data after {defined} time', async () => {
         jest.useRealTimers();
 
         const expiryTime = KEY_EXPIRY_TIME * 1000;
