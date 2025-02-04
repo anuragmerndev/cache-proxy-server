@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Express, Request, Response } from "express";
 import { config } from 'dotenv';
 
 import { AppArguments } from "./utils/AppArgManagement";
@@ -9,36 +9,37 @@ import { globalErrorHandler } from "./middleware/globalErrorHandler";
 
 config();
 
-const appArgs = new AppArguments(process.argv);
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(apiRequestLogger);
 
-const urlCache = new CentralCacheManagement(appArgs.getArgValue('origin')!)
-
 app.get("/healthy", (_req, res) => {
     res.send("working");
 })
 
-app.get("/cache", async (req, res) => {
-    const data = await urlCache.getAllCachedUrl();
-    res.send(data);
-})
+// app.get("/cache", async (req, res) => {
+// const urlCache = new CentralCacheManagement(appArgs.getArgValue('origin')!)
+//     const data = await urlCache.getAllCachedUrl();
+//     res.send(data);
+// })
 
-app.get("/cacheCount", async (req, res) => {
-    const cacheCount = await urlCache.totalUrlCached();
-    res.send({
-        cachedUrls: cacheCount
-    })
-})
+// app.get("/cacheCount", async (req, res) => {
+// const urlCache = new CentralCacheManagement(appArgs.getArgValue('origin')!)
 
-app.get("*", async (req, res) => {
+//     const cacheCount = await urlCache.totalUrlCached();
+//     res.send({
+//         cachedUrls: cacheCount
+//     })
+// })
+
+app.get("*", async (req: Request, res: Response) => {
+    const appArgs = AppArguments.getInstance();
+    const urlCache = CentralCacheManagement.getInstance(appArgs.getArgValue('origin')!);
     const url = `${urlCache.baseUrl}${req.url}`;
     const getData = await urlCache.getData(url);
     res.setHeader('X-Cache', getCacheHeader(getData.type))
-    res.send(getData.data);
+    return res.send(getData.data);
 })
 
 app.use(globalErrorHandler);
