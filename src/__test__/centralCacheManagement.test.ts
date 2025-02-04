@@ -75,7 +75,7 @@ describe('Testing Central CacheManagement', () => {
     }
 
     beforeAll(() => {
-        cache = new CentralCacheManagement(hostUrl);
+        cache = CentralCacheManagement.getInstance(hostUrl);
     })
 
     test('check if the data is not cached', async () => {
@@ -143,7 +143,7 @@ describe('Testing failover mechanism of redis', () => {
     };
 
     beforeAll(() => {
-        cache = new CentralCacheManagement(hostUrl);
+        cache = CentralCacheManagement.getInstance(hostUrl);
     })
 
     test('Should retrieve data from redis, once Redis is connected', async () => {

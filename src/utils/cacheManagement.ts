@@ -123,7 +123,9 @@ class CentralCacheManagement extends CacheManagement {
     redisCache: RedisCacheManagemt;
     redisClient: Redis;
     private isRedisConnected: boolean = false;
-    constructor(baseUrl: string) {
+    private static instance: CentralCacheManagement | null = null;
+
+    private constructor(baseUrl: string) {
         const base = baseUrl || 'default';
         super(base);
         this.redisClient = RedisClient.getInstance();
@@ -146,6 +148,13 @@ class CentralCacheManagement extends CacheManagement {
         })
 
     };
+
+    public static getInstance(baseUrl: string): CentralCacheManagement {
+        if (!CentralCacheManagement.instance) {
+            CentralCacheManagement.instance = new CentralCacheManagement(baseUrl);
+        }
+        return CentralCacheManagement.instance;
+    }
 
     public async getData(url: string): Promise<SingleResponseFormat> {
         if (this.isRedisConnected) {
