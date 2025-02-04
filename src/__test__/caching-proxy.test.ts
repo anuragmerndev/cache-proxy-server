@@ -35,8 +35,7 @@ describe('Forwarding RequestsTesting the caching proxy server', () => {
          const originalArgv = process.argv;
          process.argv = ['--port', '8000', '--origin', 'http://dummyjson.com'];
  
-         // Start the server programmatically with the mocked arguments
-        // Now import the server AFTER modifying process.argv
+        // import the server AFTER modifying process.argv
         const { startServer } = await import("../server");
 
         // Start the server programmatically

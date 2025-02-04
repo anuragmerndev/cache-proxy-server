@@ -18,21 +18,6 @@ app.get("/healthy", (_req, res) => {
     res.send("working");
 })
 
-// app.get("/cache", async (req, res) => {
-// const urlCache = new CentralCacheManagement(appArgs.getArgValue('origin')!)
-//     const data = await urlCache.getAllCachedUrl();
-//     res.send(data);
-// })
-
-// app.get("/cacheCount", async (req, res) => {
-// const urlCache = new CentralCacheManagement(appArgs.getArgValue('origin')!)
-
-//     const cacheCount = await urlCache.totalUrlCached();
-//     res.send({
-//         cachedUrls: cacheCount
-//     })
-// })
-
 app.get("*", async (req: Request, res: Response) => {
     const appArgs = AppArguments.getInstance();
     const urlCache = CentralCacheManagement.getInstance(appArgs.getArgValue('origin')!);
