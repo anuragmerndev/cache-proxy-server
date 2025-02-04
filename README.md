@@ -90,6 +90,12 @@ Ensure you have the following installed:
 
 7. The server will now run on `http://localhost:3000` (or your configured port).
 
+8. Clear Cache:
+   ```sh
+   npm run start:dev -- --clear-cache
+   caching-proxy --clear-cache
+   ```
+
 ## 🔧 Configuration
 The application takes command-line arguments for setup:
 - `--port <port>`: Specifies the port for the server

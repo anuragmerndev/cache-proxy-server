@@ -179,6 +179,10 @@ class CentralCacheManagement extends CacheManagement {
 
         return this.localCache.totalUrlCached();
     }
+
+    public async clearCache() {
+        return redisClient?.flushall();
+    }
 }
 
 

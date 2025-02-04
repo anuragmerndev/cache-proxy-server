@@ -20,7 +20,7 @@ const getCacheHeader = (cacheStatus: number): string => {
     }
 }
 
-const deleteExpiredKey = async (cb: () => Promise<void>, expiry = KEY_EXPIRY_TIME * 1000) => {
+const deleteExpiredKey = async (cb: () => Promise<void>, expiry?: number) => {
     setTimeout(async () => {
         try {
             logger.info('🔁 Deleting the key')
@@ -29,7 +29,7 @@ const deleteExpiredKey = async (cb: () => Promise<void>, expiry = KEY_EXPIRY_TIM
         } catch (err) {
             logger.error('❌ Error deleting the key ==> ', err);
         }
-        }, expiry);
+        }, expiry ? expiry : Number(process.env.KEY_EXPIRY_TIME) * 1000);
 }
 
 export { getCacheHeader, deleteExpiredKey }
