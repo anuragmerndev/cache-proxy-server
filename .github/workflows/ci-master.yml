@@ -19,8 +19,14 @@ jobs:
               with:
                 node-version: '18.x'
 
+            - name: Run installation
+              run: npm ci
+            
             - name: Run test cases
               run: npm run test
+              env:
+                KEY_EXPIRY_TIME: ${{ secrets.KEY_EXPIRY_TIME }}
+                REDIS_HOST: ${{ secrets.REDIS_HOST }}
 
             - name: Run build cases
               run: npm run build
