@@ -19,6 +19,9 @@ jobs:
               with:
                 node-version: '18.x'
 
+            - name: Run installation
+              run: npm ci
+            
             - name: Run test cases
               run: npm run test
 
