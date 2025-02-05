@@ -1,0 +1,5 @@
+echo "[Husky] Running Testing"
+npm run test
+
+echo "[Husky] Running Build"
+npm run build

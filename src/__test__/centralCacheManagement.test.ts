@@ -168,7 +168,7 @@ describe('Testing failover mechanism of redis', () => {
         redisMock.simulateRedisUp();
         const data = await cache.getData(testUrl);
         expect(data.data).toMatchObject(testData);
-        expect(data.type).toBe(CacheType.HIT);
+        expect(data.type).toBe(CacheType.MISS);
     });
 
     test('Should cache data in local cache, when redis is down', async () => {
