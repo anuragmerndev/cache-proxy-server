@@ -54,6 +54,17 @@ Ensure you have the following installed:
 - [Node.js](https://nodejs.org/) (v20+ recommended)
 - [Redis](https://redis.io/) server (for central caching)
 
+### Steps to Run Using Docker
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/anuragmerndev/cache-proxy-server.git
+   cd cache-proxy-server
+   ```
+2. Run the docker compose
+   ```sh
+   docker compose up      
+   ```
+
 ### Steps to Install & Run
 1. Clone the repository:
    ```sh

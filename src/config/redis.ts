@@ -11,6 +11,7 @@ class RedisClient {
         if (!RedisClient.instance) {
             try {
                 RedisClient.instance = new Redis({
+                    host: process.env.REDIS_HOST,
                     retryStrategy: (times) => {
                         if (times >= 3) {
                             logger.error("❌ Max Redis connection retries reached. Stopping retries.");

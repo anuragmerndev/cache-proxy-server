@@ -39,7 +39,7 @@ describe('Forwarding RequestsTesting the caching proxy server', () => {
         const { startServer } = await import("../server");
 
         // Start the server programmatically
-        server = startServer();
+        server = await startServer();
  
          // Restore the original process.argv after the test setup
          process.argv = originalArgv;

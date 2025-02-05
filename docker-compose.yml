@@ -1,4 +1,15 @@
 services:
+  cache-proxy:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+
   redis:
     image: redis
     ports:
