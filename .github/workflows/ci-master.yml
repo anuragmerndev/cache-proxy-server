@@ -1,0 +1,32 @@
+name: 🧪 Run CI for the master
+
+on: 
+    pull_request:
+        types:
+            - opened
+        branches: 
+            - 'master'
+
+jobs:
+    tests:
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v3
+
+            - name: setup node.js
+              uses: actions/setup-node@v3
+              with:
+                node-version: '18.x'
+
+            - name: Run installation
+              run: npm ci
+            
+            - name: Run test cases
+              run: npm run test
+              env:
+                KEY_EXPIRY_TIME: ${{ secrets.KEY_EXPIRY_TIME }}
+                REDIS_HOST: ${{ secrets.REDIS_HOST }}
+
+            - name: Run build cases
+              run: npm run build

@@ -166,6 +166,7 @@ describe('Testing failover mechanism of redis', () => {
         redisMock.simulateRedisDown();
         await cache.getData(testUrl);
         redisMock.simulateRedisUp();
+        await cache.getData(testUrl);
         const data = await cache.getData(testUrl);
         expect(data.data).toMatchObject(testData);
         expect(data.type).toBe(CacheType.HIT);

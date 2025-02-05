@@ -9,6 +9,6 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "exclude": ["__tests__"],
+  "exclude": ["./src/__test__", "./src/__mocks__"],
   "include": ["./src/**/*"]
 }
